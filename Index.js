@@ -5,13 +5,14 @@ const cors = require('cors');
 const port = 3001;
 const { Server } = require('socket.io');
 const server = http.createServer(app);
-app.use(express.static('public'))
+
+
 const route=require('./Router')
 const Group=require('./Grouprouter')
 
-
+app.use(express.static('public'))
 app.use(express.json())
-app.use(cors());
+app.use(cors()); 
 app.options("*", cors())
 app.use('/router',route)
 app.use("/Grouprouter",Group)
@@ -33,7 +34,7 @@ pool.query('SELECT * FROM chat_messages', (err, res) => {
     console.error(err);
   } else {
     console.log("No error");
-    //  console.log(res);
+      console.log(res);
   }
 });
 
@@ -81,7 +82,6 @@ io.on('connection', (socket) => {
         console.log('Message stored in the database:', result);
       }
     });
-
 
     socket.to(data.room).emit("receive_message",data)
   });
