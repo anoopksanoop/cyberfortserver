@@ -16,6 +16,25 @@ app.options("*", cors());
 app.use("/router", route);
 app.use("/Grouprouter", Group);
 
+
+//  const swaggerAutogen = require('swagger-autogen')();
+
+// const doc = {
+//   info: {
+//     title: 'My API+ Node ',
+//     description: 'Node Express+ MYSQL API'
+//   },
+//   host: 'localhost:3001',
+//   schemes:['http'],
+// };
+
+// const outputFile = './swagger-output.json';
+// const endpointsFiles= ['./index.js'];
+
+// swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
+//   require('/index.js');
+// });
+
 const { createPool } = require("mysql");
 
 // Create a MySQL connection pool
@@ -26,14 +45,7 @@ const pool = createPool({
   database: "chat",
   connectionLimit: 10,
 });
-pool.query("SELECT * FROM chat_messages", (err, res) => {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log("No error");
-    console.log(res);
-  }
-});
+
 
 const io = new Server(server, {
   cors: {
@@ -88,6 +100,12 @@ io.on("connection", (socket) => {
     console.log("User Disconnect", socket.id);
   });
 });
+
+const swaggerUi=require('swagger-ui-express')
+const swaggerDocument=require('./swagger-output.json')
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
