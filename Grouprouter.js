@@ -59,9 +59,9 @@ router.post("/signup", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-  console.log("Login")
-  console.log(req.url)
-  var url = req.protocol + '://' + req.get('host');
+  console.log("Login");
+  console.log(req.url);
+  var url = req.protocol + "://" + req.get("host");
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -81,7 +81,7 @@ router.post("/login", (req, res) => {
     console.log("WHERE email AND password");
     if (results.length > 0) {
       const user = results[0];
-      user.image = `${url}${user.image}`
+      user.image = `${url}${user.image}`;
       res.json({ message: "Login successful", user });
     } else {
       res.status(401).json({ message: "Invalid email or password" });
@@ -89,59 +89,8 @@ router.post("/login", (req, res) => {
   });
 });
 
-
-
-// router.post("/profile", upload.single("image"), (req, res) => {
-//   console.log(req.body);
-//   console.log(req.file);
-//   const userId = req.body.userId;
-//   const image = req.file.filename;
-//   const imagePath = req.file.path.replace("public", "");
-
-//   console.log(JSON.stringify(image));
-//   console.log("User Id", userId);
-//   console.log(req.file.path);
-//   const updateQuery = `UPDATE user_list SET image = ? WHERE id = ?`;
-
-//   pool.query(updateQuery, [imagePath, userId], (err, results) => {
-//     if (err) {
-//       console.error("Error updating data in MySQL:", err);
-//       return res.status(500).json({ message: "Internal server error" });
-//     }
-//     console.log("After save success");
-//     console.log(JSON.stringify(results));
-
-//     res.json({ message: "Profile updated successfully", results });
-//   });
-// });
-
-
-// router.get("/profile/:userId", (req, res) => {
-//   const userId = req.params.userId;
-//   const selectQuery = `SELECT * FROM user_list WHERE id = ?`;
-
-//   pool.query(selectQuery, [userId], (err, results) => {
-//     if (err) {
-//       console.error("Error querying data from MySQL:", err);
-//       return res.status(500).json({ message: "Internal server error" });
-//     }
-
-//     if (results.length > 0) {
-//       const user = results[0];
-
-//       // Include the full URL for the user's image in the response
-//       user.image = `http://localhost:3001/${user.image}`;
-
-//       res.json({ message: "Profile information fetched successfully", user });
-//     } else {
-//       res.status(404).json({ message: "User not found" });
-//     }
-//   });
-// });
-
-
 router.post("/profile", upload.single("image"), (req, res) => {
-  const url = req.protocol + '://' + req.get('host');
+  const url = req.protocol + "://" + req.get("host");
   console.log(req.body);
   console.log(req.file);
   const userId = req.body.userId;
@@ -184,8 +133,6 @@ router.post("/profile", upload.single("image"), (req, res) => {
   });
 });
 
-
-
 router.post("/posts", upload.single("image"), (req, res) => {
   console.log(req.body);
   console.log(req.file);
@@ -218,13 +165,13 @@ router.post("/posts", upload.single("image"), (req, res) => {
 });
 
 router.get("/posts/:id?", (req, res) => {
-  console.log("GET post")
-  const url = req.protocol + '://' + req.get('host');
-  
-  console.log(url)
-  console.log("#################")
+  console.log("GET post");
+  const url = req.protocol + "://" + req.get("host");
+
+  console.log(url);
+  console.log("#################");
   let selectAllPostsQuery = `SELECT * FROM posts`;
-  if(req.params.id){
+  if (req.params.id) {
     selectAllPostsQuery = `${selectAllPostsQuery} WHERE userId=${req.params.id}`;
   }
 
@@ -234,17 +181,17 @@ router.get("/posts/:id?", (req, res) => {
       return res.status(500).json({ message: "Internal server error" });
     }
     results = results.map((post) => {
-      post.image = `${url}${post.image}`
+      post.image = `${url}${post.image}`;
       return post;
-    })
+    });
 
     res.json({ posts: results });
   });
 });
 
-router.get('/post/:id', (req, res) => {
+router.get("/post/:id", (req, res) => {
   const id = req.params.id;
-  const url = req.protocol + '://' + req.get('host');
+  const url = req.protocol + "://" + req.get("host");
   const selectQuery = `SELECT * FROM posts WHERE id = ?`;
   pool.query(selectQuery, [id], (selectErr, selectResults) => {
     if (selectErr) {
@@ -304,5 +251,26 @@ router.delete("/posts/:postId", (req, res) => {
     });
   });
 });
+
+
+// Increment or decrement like count and save like to database
+router.post('/posts/:id/like', (req, res) => {
+  const postId = req.params.id;
+  const { liked } = req.body;
+
+  const updateQuery = 'UPDATE posts SET likeCount = likeCount + ? WHERE id = ?';
+  const likeChange = liked ? 1 : -1;
+
+  pool.query(updateQuery, [likeChange, postId], (error, result) => {
+    if (error) {
+      console.error('Error updating like count in the database:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.status(200).json({ success: true });
+    }
+  });
+});
+
+
 
 module.exports = router;

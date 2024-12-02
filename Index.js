@@ -17,24 +17,6 @@ app.use("/router", route);
 app.use("/Grouprouter", Group);
 
 
-//  const swaggerAutogen = require('swagger-autogen')();
-
-// const doc = {
-//   info: {
-//     title: 'My API+ Node ',
-//     description: 'Node Express+ MYSQL API'
-//   },
-//   host: 'localhost:3001',
-//   schemes:['http'],
-// };
-
-// const outputFile = './swagger-output.json';
-// const endpointsFiles= ['./index.js'];
-
-// swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
-//   require('/index.js');
-// });
-
 const { createPool } = require("mysql");
 
 // Create a MySQL connection pool
